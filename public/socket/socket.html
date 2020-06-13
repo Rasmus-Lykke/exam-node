@@ -1,0 +1,21 @@
+<h1>What's on your mind?</h1>
+<input id="thoughts" />
+<button id="submit">Submit</button>
+
+<div id="conversation"></div>
+
+<script>
+    const socket = io.connect("localhost:3000");
+
+    $('#submit').click(() => {
+        const thoughts = $('#thoughts').val();
+        $('#thoughts').val('');
+        socket.emit('a client wrote this', {
+            thoughts
+        });
+    });
+
+    socket.on('A client said', data => {
+        $('#conversation').prepend(`<div>${data.thoughts}</div>`);
+    });
+</script>
