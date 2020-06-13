@@ -3,6 +3,7 @@ const crypto = require("crypto");
 const multer = require('multer');
 const Comment = require('../models/Comment.js')
 const Picture = require('../models/Picture.js');
+const User = require('../models/User.js');
 const fs = require("fs");
 var obj = {
     pictures: []
@@ -53,17 +54,19 @@ router.get("/pictures/:pictureId", async (req, res) => {
 });
 
 
-router.post("/pictures", upload.single('uploadedpicture'), (req, res) => {
+router.post("/pictures", upload.single('uploadedpicture'), async (req, res) => {
+    let userId = await User.query().select('id').where('email', req.session.user[0].email);
+    
     const picture = {
         title: req.body.title.trim(),
         description: req.body.description,
-        thumbnail: "",
         fileName: req.file.filename,
-        uploadDate: new Date(),
+        createdAt: new Date(),
         category: req.body.category,
-        //Regex 
-        tags: req.body.tags.split(/\s*[,\s]\s*/)
+        //Regex
+        // tags: req.body.tags.split(/\s*[,\s]\s*/),
         //tags: req.body.tags.replace(","," ").split(" ")
+        userId: userId[0].id
     };
 
     // Server validation of the uploaded image in information typed by the user. 
@@ -90,56 +93,29 @@ router.post("/pictures", upload.single('uploadedpicture'), (req, res) => {
         })
     };
 
+    /*
     const tagsMaxLength = 8;
     if (picture.tags.length > tagsMaxLength) {
         return res.status(400).send({
             response: `Error: Amount of tags is ${picture.tags.length} but must be less than ${tagsMaxLength}`
         })
     };
-
+    */
 
     obj.pictures.push(picture);
-    writeToFile();
+    saveToDB(picture, req.session.user[0].email)
 
     return res.redirect("/");
 });
 
 
-// ToDo!
-// The picture information are for now saved in a json file called myjsonfile.json.
-// It is intended to convert this to a database in the near future. This would also make it easier with implementing comments. 
-function writeToFile() {
-    var json = JSON.stringify(obj);
-    fs.writeFile('myjsonfile.json', json, 'utf8', (err, data) => {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log("Write successful!");
-        };
-    });
-};
-
-async function saveToDB() {
-
-    
-    await User.query().insert({
-        title,
-        fileName,
-        description,
-        category,
-        userId
-    }).then(savedPicture => {
-        return res.send({
-            response: `The picture ${savedPicture.title} was created`
-        });
-    });
-
+async function saveToDB(picture) {
+    await Picture.query().insert(picture);
 }
 
 module.exports = {
     router: router,
-    //ToDo!
-    readFromFile: async function () {
+    readFromDB: async function () {
         obj.pictures = await Picture.query().select("title", "file_name", "description", "category", "user_id");
     }
 };

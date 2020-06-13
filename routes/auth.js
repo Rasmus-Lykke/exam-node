@@ -37,7 +37,6 @@ router.post('/signin', (req, res) => {
                     // Decrypting the password found in the database and compares it with the password typed in into the form.
                     bcrypt.compare(password, foundUser[0].password).then(result => {
                         if (result == true) {
-                            console.log(req.session.user)
                             console.log("Login success")
                             req.session.regenerate(function(){
                                 // Store the user's primary key

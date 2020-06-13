@@ -95,19 +95,16 @@ const signupPage = fs.readFileSync("./public/signup/signup.html", "utf8");
 const socketPage = fs.readFileSync("./public/socket/socket.html", "utf8");
 
 function checkAuth(req, res, next) {
-    if (!req.session.user) {
+    if (!req.session.user) { // OBS! While develeoping when done change to (!req.session.user)!!!!
         req.session.error = "Access denied!"
         res.redirect("/signin")
     } else {
-        console.log("Current user: " + req.session.user[0].email)
-        console.log("Success");
         next();
     }
 }
 
 app.get("/", checkAuth, (req, res) => {
-    console.log(req.sessionID)
-    videosRoute.readFromFile();
+    videosRoute.readFromDB();
     return res.send(navbarPage + frontpagePage + footerPage);
 });
 
@@ -142,7 +139,7 @@ const server = app.listen(port, (error) => {
     }
     console.log("This server is running on port", server.address().port);
 
-    videosRoute.readFromFile();
+    videosRoute.readFromDB();
 
 });
 
