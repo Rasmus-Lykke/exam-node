@@ -3,13 +3,15 @@ const app = express();
 
 const session = require('express-session');
 
-const {uuid} = require('uuidv4')
+const {
+    uuid
+} = require('uuidv4')
 
 // parse application/json
 app.use(express.json());
 
-/*
-var bodyParser = require('body-parser')
+
+const bodyParser = require('body-parser')
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({
     extended: false
@@ -18,20 +20,9 @@ app.use(bodyParser.urlencoded({
 // parse application/json
 app.use(bodyParser.json())
 
-*/
 
 const fs = require("fs");
 
-
-/*
-// JSON Web Token
-const jwt = require('jsonwebtoken');
-
-const helmet = require('helmet');
-app.use(helmet());
-
-const escape = require('escape-html');
-*/
 
 // You need to copy the config.template.json file and fill out your own secret
 const config = require('./config/config.json');
@@ -47,8 +38,6 @@ app.use(session({
     resave: false,
     saveUninitialized: true
 }));
-
-
 
 // Setup rateLimit
 const rateLimit = require('express-rate-limit');
@@ -87,6 +76,7 @@ app.use(express.static('pictures'));
 const authRoute = require('./routes/auth.js');
 const usersRoute = require('./routes/users.js');
 const videosRoute = require("./routes/pictures");
+
 // Set up routes with our server
 app.use(videosRoute.router);
 app.use(authRoute);
@@ -104,56 +94,28 @@ const signinPage = fs.readFileSync("./public/signin/signin.html", "utf8");
 const signupPage = fs.readFileSync("./public/signup/signup.html", "utf8");
 const socketPage = fs.readFileSync("./public/socket/socket.html", "utf8");
 
-/*
-// Check the token included in the request header for authorization of access to the pages. 
-const checkToken = (req, res, next) => {
-
-    var token = req.headers['x-access-token'] || req.headers['authorization'] || req.query.authorization; // Express headers are auto converted to lowercase
-
-    console.log(req.headers)
-
-    if (token) {
-        
-        // Some tokens have the convention of starting with the symbols "Bearer " which we are slicing. 
-        if (token.startsWith('Bearer ')) {
-            // Remove Bearer from string
-            token = token.slice(7, token.length);
-        }
-
-        // Verifying the token with the "sessionsecret" saved in the config.json file.
-        jwt.verify(token, config.sessionSecret, (err, decoded) => {
-            if (err) {
-                return res.json({
-                    success: false,
-                    message: 'Token is not valid'
-                });
-            } else {
-                req.decoded = decoded;
-                console.log("Success!")
-                next();
-            }
-        });
-
+function checkAuth(req, res, next) {
+    if (!req.session.user) {
+        req.session.error = "Access denied!"
+        res.redirect("/signin")
     } else {
-        return res.json({
-            success: false,
-            message: 'Auth token is not supplied'
-        });
+        console.log("Current user: " + req.session.user[0].email)
+        console.log("Success");
+        next();
     }
-};
-*/
+}
 
-app.get("/", (req, res) => {
-    // console.log(req.headers)
+app.get("/", checkAuth, (req, res) => {
+    console.log(req.sessionID)
     videosRoute.readFromFile();
     return res.send(navbarPage + frontpagePage + footerPage);
 });
 
-app.get("/player/:videoId", (req, res) => {
+app.get("/player/:videoId", checkAuth, (req, res) => {
     return res.send(navbarPage + playerPage + footerPage);
 });
 
-app.get("/upload", (req, res) => {
+app.get("/upload", checkAuth, (req, res) => {
     return res.send(navbarPage + uploadPage + footerPage);
 });
 
@@ -166,16 +128,7 @@ app.get("/signup", (req, res) => {
 });
 
 // For testing purposes, require an access token in the header to access
-app.get("/test", (req, res) => {
-    console.log(req.query.id);
-    return res.send({
-        response: "Success"
-    })
-})
-
-
-// For testing purposes, require an access token in the header to access
-app.get("/socket", (req, res) => {
+app.get("/socket", checkAuth, (req, res) => {
     return res.send(navbarPage + socketPage + footerPage);
 })
 

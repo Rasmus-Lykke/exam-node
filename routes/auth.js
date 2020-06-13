@@ -37,18 +37,15 @@ router.post('/signin', (req, res) => {
                     // Decrypting the password found in the database and compares it with the password typed in into the form.
                     bcrypt.compare(password, foundUser[0].password).then(result => {
                         if (result == true) {
-                            // Creating the access token and returning it to the client, who is supposed to use when accessing locked pages.
-                            // This access token should be sent from the client to the server in the req.header. 
-        
-                            /* 
-                            const accessToken = jwt.sign({username: foundUser[0].username}, config.sessionSecret);
-                            // document.cookie = "auth="+accessToken;
-                            res.json({
-                                type: true,
-                                data: foundUser[0].username,
-                                token: accessToken // The token
-                            });
-                            */
+                            console.log(req.session.user)
+                            console.log("Login success")
+                            req.session.regenerate(function(){
+                                // Store the user's primary key
+                                // in the session store to be retrieved,
+                                // or in this case the entire user object
+                                req.session.user = foundUser;
+                                res.redirect('/');
+                              });
 
                         } else {
                             return res.send({

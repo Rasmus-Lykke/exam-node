@@ -2,6 +2,7 @@ const router = require("express").Router();
 const crypto = require("crypto");
 const multer = require('multer');
 const Comment = require('../models/Comment.js')
+const Picture = require('../models/Picture.js');
 const fs = require("fs");
 var obj = {
     pictures: []
@@ -28,20 +29,6 @@ const upload = multer({
     storage: storage
 });
 
-// The picture information are for now saved in a json file called myjsonfile.json.
-// It is intended to convert this to a database in the near future. This would also make it easier with implementing comments. 
-function writeToFile() {
-    var json = JSON.stringify(obj);
-    fs.writeFile('myjsonfile.json', json, 'utf8', (err, data) => {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log("Write successful!");
-        };
-    });
-};
-
-
 const picturesPerPage = 12;
 router.get("/pictures", (req, res) => {
     const page = Number(req.query.page) ? Number(req.query.page) : 1;
@@ -58,7 +45,7 @@ router.get("/pictures/:pictureId", async (req, res) => {
         .select('comment', 'username')
         .join('users', 'users.id', "=", "comments.user_id")
         .where({filename: req.params.pictureId})
-        
+
     return res.send({
         response: obj.pictures.find(picture => picture.fileName === req.params.pictureId),
         comments: allComments
@@ -117,16 +104,42 @@ router.post("/pictures", upload.single('uploadedpicture'), (req, res) => {
     return res.redirect("/");
 });
 
+
+// ToDo!
+// The picture information are for now saved in a json file called myjsonfile.json.
+// It is intended to convert this to a database in the near future. This would also make it easier with implementing comments. 
+function writeToFile() {
+    var json = JSON.stringify(obj);
+    fs.writeFile('myjsonfile.json', json, 'utf8', (err, data) => {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log("Write successful!");
+        };
+    });
+};
+
+async function saveToDB() {
+
+    
+    await User.query().insert({
+        title,
+        fileName,
+        description,
+        category,
+        userId
+    }).then(savedPicture => {
+        return res.send({
+            response: `The picture ${savedPicture.title} was created`
+        });
+    });
+
+}
+
 module.exports = {
     router: router,
-    readFromFile: function () {
-        fs.readFile('myjsonfile.json', 'utf8', (err, data) => {
-            if (err) {
-                console.log(err);
-            } else {
-                console.log("Read successful!")
-                obj = JSON.parse(data); //now it an object
-            };
-        });
+    //ToDo!
+    readFromFile: async function () {
+        obj.pictures = await Picture.query().select("title", "file_name", "description", "category", "user_id");
     }
 };
