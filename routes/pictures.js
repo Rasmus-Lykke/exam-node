@@ -54,9 +54,11 @@ router.get("/pictures", (req, res) => {
 });
 
 router.get("/pictures/:pictureId", async (req, res) => {
-    const allComments = await Comment.query().select('comment', 'username').join('users', 'users.id', "=", "comments.user_id").where({filename: req.params.pictureId})
-    console.log(allComments.length)
-    console.log(req.params.pictureId)
+    const allComments = await Comment.query()
+        .select('comment', 'username')
+        .join('users', 'users.id', "=", "comments.user_id")
+        .where({filename: req.params.pictureId})
+        
     return res.send({
         response: obj.pictures.find(picture => picture.fileName === req.params.pictureId),
         comments: allComments

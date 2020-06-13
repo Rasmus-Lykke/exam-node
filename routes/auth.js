@@ -40,6 +40,7 @@ router.post('/signin', (req, res) => {
                             // Creating the access token and returning it to the client, who is supposed to use when accessing locked pages.
                             // This access token should be sent from the client to the server in the req.header. 
         
+                            /* 
                             const accessToken = jwt.sign({username: foundUser[0].username}, config.sessionSecret);
                             // document.cookie = "auth="+accessToken;
                             res.json({
@@ -47,6 +48,7 @@ router.post('/signin', (req, res) => {
                                 data: foundUser[0].username,
                                 token: accessToken // The token
                             });
+                            */
 
                         } else {
                             return res.send({

@@ -1,20 +1,29 @@
 const express = require("express");
 const app = express();
 
+const session = require('express-session');
+
+const {uuid} = require('uuidv4')
+
 // parse application/json
 app.use(express.json());
 
+/*
 var bodyParser = require('body-parser')
 // parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({
+    extended: false
+}))
 
 // parse application/json
 app.use(bodyParser.json())
 
+*/
+
 const fs = require("fs");
 
-const session = require('express-session');
 
+/*
 // JSON Web Token
 const jwt = require('jsonwebtoken');
 
@@ -22,13 +31,18 @@ const helmet = require('helmet');
 app.use(helmet());
 
 const escape = require('escape-html');
-
+*/
 
 // You need to copy the config.template.json file and fill out your own secret
 const config = require('./config/config.json');
 
 // Middleware, sits between the request and the response
 app.use(session({
+    genid: (req) => {
+        console.log('Inside the session middleware')
+        console.log(req.sessionID)
+        return uuid() // use UUIDs for session IDs
+    },
     secret: config.sessionSecret,
     resave: false,
     saveUninitialized: true
@@ -55,7 +69,9 @@ app.use('/signup', authLimiter);
 app.use('/signin', authLimiter);
 
 /* Setup Knex with Objection */
-const { Model } = require('objection');
+const {
+    Model
+} = require('objection');
 const Knex = require('knex');
 const knexfile = require('./knexfile.js');
 
@@ -88,6 +104,7 @@ const signinPage = fs.readFileSync("./public/signin/signin.html", "utf8");
 const signupPage = fs.readFileSync("./public/signup/signup.html", "utf8");
 const socketPage = fs.readFileSync("./public/socket/socket.html", "utf8");
 
+/*
 // Check the token included in the request header for authorization of access to the pages. 
 const checkToken = (req, res, next) => {
 
@@ -124,6 +141,7 @@ const checkToken = (req, res, next) => {
         });
     }
 };
+*/
 
 app.get("/", (req, res) => {
     // console.log(req.headers)
@@ -148,9 +166,11 @@ app.get("/signup", (req, res) => {
 });
 
 // For testing purposes, require an access token in the header to access
-app.get("/test", checkToken, (req, res) => {
+app.get("/test", (req, res) => {
     console.log(req.query.id);
-    return res.send({response: "Success"})
+    return res.send({
+        response: "Success"
+    })
 })
 
 
@@ -182,7 +202,9 @@ io.on('connection', socket => {
 
     socket.on('a client wrote this', (data) => {
         // emits to all clients
-        io.emit("A client said", { thoughts: escape(data.thoughts) });
+        io.emit("A client said", {
+            thoughts: escape(data.thoughts)
+        });
 
         // only emits to the very socket that fired the event
         // socket.emit("A client said", data);
