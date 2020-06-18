@@ -49,7 +49,7 @@ const limiter = rateLimit({
 
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 15 // limit each IP to 15 requests per windowMs
+    max: 25 // limit each IP to 15 requests per windowMs
 });
 
 app.use(limiter);
@@ -95,7 +95,7 @@ const signupPage = fs.readFileSync("./public/signup/signup.html", "utf8");
 const socketPage = fs.readFileSync("./public/socket/socket.html", "utf8");
 
 function checkAuth(req, res, next) {
-    if (!req.session.user) { // OBS! While develeoping when done change to (!req.session.user)!!!!
+    if (!req.session.user) {
         req.session.error = "Access denied!"
         res.redirect("/signin")
     } else {
@@ -120,48 +120,39 @@ app.get("/signin", (req, res) => {
     return res.send(navbarPage + signinPage + footerPage);
 });
 
-app.get("/signup", (req, res) => {
-    return res.send(navbarPage + signupPage + footerPage);
-});
-
-// For testing purposes, require an access token in the header to access
+// For testing purposes, no real use yet
 app.get("/socket", checkAuth, (req, res) => {
     return res.send(navbarPage + socketPage + footerPage);
 })
 
+app.get("/signup", (req, res) => {
+    return res.send(navbarPage + signupPage + footerPage);
+});
+
+app.get("/signout", (req, res) => {
+    req.session.user = null;
+    return res.redirect("/");
+});
 
 // Setting up the server with port number
 const port = process.env.PORT ? process.env.PORT : 3000;
 const server = app.listen(port, (error) => {
-
     if (error) {
         console.log("Error starting the server");
     }
     console.log("This server is running on port", server.address().port);
 
     videosRoute.readFromDB();
-
 });
 
 // Sockets
 const io = require("socket.io")(server);
-
 // Sockets
 io.on('connection', socket => {
-    // console.log(socket.id);
-
     socket.on('a client wrote this', (data) => {
         // emits to all clients
         io.emit("A client said", {
             thoughts: escape(data.thoughts)
         });
-
-        // only emits to the very socket that fired the event
-        // socket.emit("A client said", data);
-
-        // emits to all except the socket itself
-        // socket.broadcast.emit("A client said", data);
     });
-
-
 });
