@@ -18,14 +18,14 @@ $.get(`/pictures/${pictureId}`)
 
         data.comments.map((comment) => {
             $("#comments")
-                .append(`   <li class="list-group-item list-group-item-action w-25"> 
+                .append(`   <li class="list-group-item list-group-item-action w-50"> 
                                 <a class= "text-primary"> ${comment.username}: </a>
                                 <ul>
                                     <li>
                                         <a>${comment.comment}</a>
                                     </li>
                                 </ul>
-                            </li>`).addClass("container mt-5")
+                            </li>`).addClass("container text-center mt-5")
         });
     })
     .catch((error) => {

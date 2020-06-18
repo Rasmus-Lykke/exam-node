@@ -8,6 +8,7 @@ const fs = require("fs");
 var obj = {
     pictures: []
 };
+let pictureId = "";
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -42,13 +43,16 @@ router.get("/pictures", (req, res) => {
 });
 
 router.get("/pictures/:pictureId", async (req, res) => {
+    
     const allComments = await Comment.query()
         .select('comment', 'username')
         .join('users', 'users.id', "=", "comments.user_id")
-        .where({filename: req.params.pictureId})
+        .where({filename: req.params.pictureId});
+
+    pictureId = req.params.pictureId;
 
     return res.send({
-        response: obj.pictures.find(picture => picture.fileName === req.params.pictureId),
+        response: obj.pictures.find(picture => picture.fileName === pictureId),
         comments: allComments
     });
 });
@@ -103,11 +107,28 @@ router.post("/pictures", upload.single('uploadedpicture'), async (req, res) => {
     */
 
     obj.pictures.push(picture);
-    saveToDB(picture, req.session.user[0].email)
+    saveToDB(picture)
 
     return res.redirect("/");
 });
 
+router.post("/newcomment", async (req, res) => {
+    let userId = await User.query().select('id').where('email', req.session.user[0].email);
+    
+    const comment = {
+        comment: req.body.comment.trim(),
+        filename: pictureId,
+        userId: userId[0].id
+    };
+
+    saveCommentToDB(comment);
+
+    return res.redirect("/player/" + pictureId);
+});
+
+async function saveCommentToDB(comment) {
+    await Comment.query().insert(comment);
+}
 
 async function saveToDB(picture) {
     await Picture.query().insert(picture);

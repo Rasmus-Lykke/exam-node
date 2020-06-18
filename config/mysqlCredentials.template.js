@@ -1,5 +1,5 @@
 module.exports = {
-    database: 'car_zone_db  ',
-    user: 'root',
-    password: 'K5jc7S00D'
+    database: 'Database name',
+    user: 'User',
+    password: 'Password'
 };
