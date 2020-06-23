@@ -6,7 +6,7 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "start": "cross-env PORT=80 node app.js",
-        "start-prod": "sudo cross-env PORT=80 pm2 start app.js -f",
+        "start-prod": "sudo PORT=80 pm2 start app.js -f",
         "start-dev": "cross-env PORT=3000 nodemon app.js",
         "migrate:latest": "knex migrate:latest",
         "migrate:make": "knex migrate:make ",
