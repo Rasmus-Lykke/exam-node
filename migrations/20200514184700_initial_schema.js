@@ -8,7 +8,7 @@ exports.up = function (knex) {
             table.string('password').notNullable();
             table.string('email').notNullable().unique();
 
-            table.dateTime('updated_at').defaultTo(knex.raw('NULL ON UPDATE CURRENT_TIMESTAMP'));
+            table.timestamp('updated_at').defaultTo(knex.raw('NULL ON UPDATE CURRENT_TIMESTAMP'));
             table.timestamp('created_at').defaultTo(knex.fn.now());
         })
         .createTable('pictures', table => {
@@ -22,7 +22,7 @@ exports.up = function (knex) {
             table.integer('user_id').unsigned().notNullable();
             table.foreign('user_id').references('users.id');
 
-            table.dateTime('updated_at').defaultTo(knex.raw('NULL ON UPDATE CURRENT_TIMESTAMP'));
+            table.timestamp('updated_at').defaultTo(knex.raw('NULL ON UPDATE CURRENT_TIMESTAMP'));
             table.timestamp('created_at').defaultTo(knex.fn.now());
 
         })
@@ -39,7 +39,7 @@ exports.up = function (knex) {
             table.foreign('picture_id').references('pictures.id');
             */
 
-            table.dateTime('updated_at').defaultTo(knex.raw('NULL ON UPDATE CURRENT_TIMESTAMP'));
+            table.timestamp('updated_at').defaultTo(knex.raw('NULL ON UPDATE CURRENT_TIMESTAMP'));
             table.timestamp('created_at').defaultTo(knex.fn.now());
 
         });
