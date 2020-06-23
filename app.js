@@ -49,7 +49,7 @@ const limiter = rateLimit({
 
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 25 // limit each IP to 15 requests per windowMs
+    max: 50 // limit each IP to 15 requests per windowMs
 });
 
 app.use(limiter);
