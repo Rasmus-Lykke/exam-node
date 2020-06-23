@@ -5,7 +5,7 @@
 <div id="conversation"></div>
 
 <script>
-    const socket = io.connect("localhost:80");
+    const socket = io.connect("ec2-18-209-95-196.compute-1.amazonaws.com:80");
 
     $('#submit').click(() => {
         const thoughts = $('#thoughts').val();
