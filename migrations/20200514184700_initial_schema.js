@@ -8,7 +8,7 @@ exports.up = function (knex) {
             table.string('password').notNullable();
             table.string('email').notNullable().unique();
 
-            table.dateTime('updated_at').defaultTo(knex.raw('"0000-00-00 00:00:00" ON UPDATE CURRENT_TIMESTAMP'));
+            table.dateTime('updated_at').defaultTo(knex.raw('NULL ON UPDATE CURRENT_TIMESTAMP'));
             table.timestamp('created_at').defaultTo(knex.fn.now());
         })
         .createTable('pictures', table => {
