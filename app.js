@@ -92,7 +92,7 @@ const playerPage = fs.readFileSync("./public/player/player.html", "utf8");
 const uploadPage = fs.readFileSync("./public/upload/upload.html", "utf8");
 const signinPage = fs.readFileSync("./public/signin/signin.html", "utf8");
 const signupPage = fs.readFileSync("./public/signup/signup.html", "utf8");
-const socketPage = fs.readFileSync("./public/socket/socket.html", "utf8");
+const chatPage = fs.readFileSync("./public/socket/socket.html", "utf8");
 
 function checkAuth(req, res, next) {
     if (!req.session.user) {
@@ -121,8 +121,8 @@ app.get("/signin", (req, res) => {
 });
 
 // For testing purposes, no real use yet
-app.get("/socket", checkAuth, (req, res) => {
-    return res.send(navbarPage + socketPage + footerPage);
+app.get("/chat", checkAuth, (req, res) => {
+    return res.send(navbarPage + chatPage + footerPage);
 })
 
 app.get("/signup", (req, res) => {
