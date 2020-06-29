@@ -4,7 +4,8 @@ const multer = require('multer');
 const Comment = require('../models/Comment.js')
 const Picture = require('../models/Picture.js');
 const User = require('../models/User.js');
-const fs = require("fs");
+
+// Variable containing a list with all the information for each picture
 var obj = {
     pictures: []
 };
@@ -67,9 +68,6 @@ router.post("/pictures", upload.single('uploadedpicture'), async (req, res) => {
         fileName: req.file.filename,
         createdAt: new Date(),
         category: req.body.category,
-        //Regex
-        // tags: req.body.tags.split(/\s*[,\s]\s*/),
-        //tags: req.body.tags.replace(","," ").split(" ")
         userId: userId[0].id
     };
 
@@ -88,23 +86,14 @@ router.post("/pictures", upload.single('uploadedpicture'), async (req, res) => {
         })
     };
 
-    // 250MB
-    const fileSizeLimit = 262144000;
+    // 5MB
+    const fileSizeLimit = 40000000;
     if (req.file.size > fileSizeLimit) {
         fileValid = false
         return res.status(400).send({
             response: `Error: pictures size is ${req.file.size} but must be less than ${fileSizeLimit}`
         })
     };
-
-    /*
-    const tagsMaxLength = 8;
-    if (picture.tags.length > tagsMaxLength) {
-        return res.status(400).send({
-            response: `Error: Amount of tags is ${picture.tags.length} but must be less than ${tagsMaxLength}`
-        })
-    };
-    */
 
     obj.pictures.push(picture);
     saveToDB(picture)

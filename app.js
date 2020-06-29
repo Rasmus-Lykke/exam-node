@@ -94,6 +94,7 @@ const signinPage = fs.readFileSync("./public/signin/signin.html", "utf8");
 const signupPage = fs.readFileSync("./public/signup/signup.html", "utf8");
 const chatPage = fs.readFileSync("./public/socket/socket.html", "utf8");
 
+// Middleware which checks if the user is signed in through express-sessions
 function checkAuth(req, res, next) {
     if (!req.session.user) {
         req.session.error = "Access denied!"
@@ -129,13 +130,8 @@ app.get("/signup", (req, res) => {
     return res.send(navbarPage + signupPage + footerPage);
 });
 
-app.get("/signout", (req, res) => {
-    req.session.user = null;
-    return res.redirect("/");
-});
-
 // Setting up the server with port number
-const port = process.env.PORT ? process.env.PORT : 3000;
+const port = process.env.PORT ? process.env.PORT : 80;
 const server = app.listen(port, (error) => {
     if (error) {
         console.log("Error starting the server");
@@ -147,7 +143,6 @@ const server = app.listen(port, (error) => {
 
 // Sockets
 const io = require("socket.io")(server);
-// Sockets
 io.on('connection', socket => {
     socket.on('a client wrote this', (data) => {
         // emits to all clients

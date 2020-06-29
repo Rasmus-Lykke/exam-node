@@ -6,16 +6,18 @@ let pictureId = url.substr(url.lastIndexOf("/") + 1);
 $.get(`/pictures/${pictureId}`)
     .done((data) => {
 
+        // Append the title to the picture page
         $("#title").text(data.response.title).addClass("container mt-3 mb-3");
 
-        const player = `<img class="container w-50" id="player" source src="/${pictureId}"></img>`;
+        // Append the picture to the picture page
+        $("#player").append(`<img class="container w-50" id="player" source src="/${pictureId}"></img>`);
 
-        $("#player").append(player);
-
+        // Append the pictures description to the picture page
         $("#description").append(`  <p class="container border-secondary" > 
                                         ${data.response.description}
                                     </p>`).addClass("container mt-5")
 
+        // Append the comments for the picture to the picture page
         data.comments.map((comment) => {
             $("#comments")
                 .append(`   <li class="list-group-item list-group-item-action w-75"> 

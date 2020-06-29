@@ -8,14 +8,18 @@
     const socket = io.connect("ec2-18-209-95-196.compute-1.amazonaws.com:80");
 
     $('#submit').click(() => {
+        // Gets the message
         const thoughts = $('#thoughts').val();
+        // Resets the input field
         $('#thoughts').val('');
         socket.emit('a client wrote this', {
             thoughts
         });
     });
 
+    // Event listener
     socket.on('A client said', data => {
         $('#conversation').prepend(`<div>${data.thoughts}</div>`);
     });
+
 </script>

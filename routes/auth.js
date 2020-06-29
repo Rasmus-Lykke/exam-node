@@ -2,8 +2,6 @@ const router = require('express').Router();
 
 const User = require("../models/User.js");
 
-// JSON Web Token for creating JSON tokens. This is a way to validate that the user as access to the pages.
-const jwt = require('jsonwebtoken');
 // You need to copy the config.template.json file and fill out your own secret
 let config = require('../config/config.json');
 
@@ -14,10 +12,7 @@ const saltRounds = 12;
 
 router.post('/signin', (req, res) => {
 
-    console.log(req.headers)
-
     console.log("Login started");
-    console.log(req.body.email);
 
     const {
         email,
@@ -39,12 +34,10 @@ router.post('/signin', (req, res) => {
                         if (result == true) {
                             console.log("Login success")
                             req.session.regenerate(function(){
-                                // Store the user's primary key
-                                // in the session store to be retrieved,
-                                // or in this case the entire user object
+                                // Saves the user through express-sessions
                                 req.session.user = foundUser;
                                 res.redirect('/');
-                              });
+                            });
 
                         } else {
                             return res.send({
@@ -62,7 +55,6 @@ router.post('/signin', (req, res) => {
         }
 
     } else {
-
         return res.send({
             response: "You did not fulfill the requirements"
         });
@@ -94,9 +86,9 @@ router.post('/signup', (req, res) => {
                             response: "User already exists"
                         });
                     } else {
-                        // Email validation. We do not want anyone with the same username
+                        // Email validation. We do not want anyone with the same email
                         try {
-                            // Searches the database for an existing user with same username.
+                            // Searches the database for an existing user with same email.
                             User.query().select('email').where('email', email).then(foundUserEmail => {
                                 if (foundUserEmail.length > 0) {
                                     return res.status(400).send({
@@ -141,10 +133,9 @@ router.post('/signup', (req, res) => {
     }
 });
 
-router.get('/logout', (req, res) => {
-    return res.status(501).send({
-        response: "Not implemented yet"
-    });
+router.get('/signout', (req, res) => {
+    req.session.user = null;
+    return res.redirect("/");
 });
 
 module.exports = router;
