@@ -26,7 +26,7 @@
 
         // Event listener
         socket.on('A client said', data => {
-            $('#conversation').append(`
+            $('#conversation').prepend(`
                 <div>
                     <p>A user wrote this: ${data.thoughts}</p>
                 </div>
