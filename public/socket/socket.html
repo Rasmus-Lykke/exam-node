@@ -1,14 +1,16 @@
 <div class="container">
     <h1>What's on your mind?</h1>
     <div class="input-group mb-3">
-        <div class="input-goup-prepend">
+        <div class="input-group-prepend">
             <span class="input-group-text" id="basic-addon1">Your message</span>
         </div>
         <input id="thoughts" />
         <button class="btn btn-primary ml-3" id="submit">Submit</button>
     </div>
     
-    <div id="conversation"></div>
+    <div id='conversation'>
+        
+    </div>
 
     <script>
         const socket = io.connect("ec2-35-153-181-148.compute-1.amazonaws.com:80");
@@ -16,6 +18,7 @@
         $('#submit').click(() => {
             // Gets the message
             const thoughts = $('#thoughts').val();
+            console.log(thoughts)
             // Resets the input field
             $('#thoughts').val('');
 
@@ -23,8 +26,13 @@
         });
 
         // Event listener
-        socket.on('A client said', data => {   
-            $('#conversation').prepend(`<div class="text">${data.thoughts}</div>`);
+        socket.on('A client said', data => {
+            console.log("Test")
+            $('#conversation').append(`
+                <div>
+                    <p>A user wrote this: ${data.thoughts}</p>
+                </div>
+            `);
         });
 
     </script>

@@ -144,7 +144,7 @@ const server = app.listen(port, (error) => {
 // Sockets
 const io = require("socket.io")(server);
 io.on('connection', socket => {
-    socket.on('a client wrote this', (data) => {
+    socket.on('A client wrote this', (data) => {
         // emits to all clients
         io.emit("A client said", {
             thoughts: escape(data.thoughts)
