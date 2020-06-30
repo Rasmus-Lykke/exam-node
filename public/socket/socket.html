@@ -18,7 +18,6 @@
         $('#submit').click(() => {
             // Gets the message
             const thoughts = $('#thoughts').val();
-            console.log(thoughts)
             // Resets the input field
             $('#thoughts').val('');
 
@@ -27,7 +26,6 @@
 
         // Event listener
         socket.on('A client said', data => {
-            console.log("Test")
             $('#conversation').append(`
                 <div>
                     <p>A user wrote this: ${data.thoughts}</p>
